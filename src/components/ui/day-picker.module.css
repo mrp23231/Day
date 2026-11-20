@@ -1,0 +1,35 @@
+.picker {
+  display: inline-flex;
+  gap: 3px;
+  padding: 4px;
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: 13px;
+  isolation: isolate;
+}
+.option {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 36px;
+  padding: 0 13px;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 550;
+  white-space: nowrap;
+}
+.option > svg, .option > span:not(.active) { position: relative; z-index: 1; }
+.option:hover { color: var(--foreground); }
+.option[aria-checked="true"] { color: var(--primary-foreground); }
+.active { position: absolute; inset: 0; border-radius: inherit; background: var(--primary); z-index: 0; }
+.option:focus-visible { outline: 2px solid var(--foreground); outline-offset: 3px; }
+@media (max-width: 600px) {
+  .picker { width: 100%; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .option { padding-inline: 8px; min-height: 40px; gap: 5px; }
+}
+@media (max-width: 380px) { .option > svg { display: none; } }
+@media (prefers-reduced-motion: reduce) { .option { transition: none; } }

@@ -1,0 +1,7 @@
+# Day
+
+Russian-language, calm premium lifestyle web application. The user explicitly requested immediate implementation and renamed DAYO to Day; proceed without further design approval. The original pasted brief is the specification, with the new name taking precedence.
+
+Use Next.js App Router, strict TypeScript, Tailwind, Radix/shadcn-style primitives, Motion, Lucide and Recharts. Warm off-white canvas, white surfaces, sage typography and accents, restrained peach and water blue, generous whitespace. Desktop sidebar and mobile bottom navigation. Implement Today, planner, nutrition diary and calculator, water, habits, progress, assistant and settings as real working flows. Empty initial records; never present invented data as personal history. Save local records in browser storage until a configured authenticated Supabase session is available. Clearly disclose device-local mode. Include Supabase auth, user-owned tables with RLS and account export/deletion. AI calls run server-side, require authentication, and return explicit unavailable states without credentials. No fabricated scanner results.
+
+Phase boundary: verify the foundation and Today first, then add persisted core features and integrations. Nutrition arithmetic is deterministic, estimates are optional and adults-only. Service worker caches only public application assets; no private API cache. PWA manifest, icons and offline fallback. Respect reduced motion, keyboard navigation and mobile safe areas.

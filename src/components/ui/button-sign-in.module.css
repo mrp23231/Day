@@ -1,0 +1,22 @@
+.root { min-width:0; width:100%; }
+.stage { position:relative; min-width:0; height:46px; transition:height .32s cubic-bezier(.22,1,.36,1); }
+.root[data-expanded="true"] .stage { height:106px; }
+.trigger,.options button { width:100%; min-height:46px; display:flex; align-items:center; justify-content:center; gap:9px; padding:12px 16px; border:1px solid transparent; border-radius:14px; font-size:12px; font-weight:550; line-height:1.5; }
+.trigger { position:absolute; inset:0 0 auto; background:var(--primary); color:var(--primary-foreground); transition:opacity .15s,transform .25s; }
+.root[data-expanded="true"] .trigger { opacity:0; transform:scale(.92); pointer-events:none; }
+.options { display:grid; gap:10px; pointer-events:none; }
+.options button { opacity:0; transform:translateY(-6px) scale(.92); transition:transform .4s cubic-bezier(.22,1,.36,1),opacity .2s; }
+.options .google { background:var(--primary); color:var(--primary-foreground); }
+.options .email { background:var(--surface-alt); color:var(--foreground); border-color:var(--border); transform:translateY(-62px) scale(.92); }
+.root[data-expanded="true"] .options { pointer-events:auto; }
+.root[data-expanded="true"] .options button { opacity:1; transform:translateY(0) scale(1); }
+.root[data-expanded="true"] .options .email { transition-delay:.045s; }
+.options button:not(:disabled):hover,.trigger:hover { filter:brightness(.96); }
+.options button:focus-visible,.trigger:focus-visible,.collapse:focus-visible { outline:3px solid var(--blue); outline-offset:3px; }
+.collapse { display:block; padding:10px 12px 0; margin:0 auto; background:transparent; color:var(--muted); font-size:11px; }
+.spinner { animation:spin .8s linear infinite; }
+@keyframes spin { to { transform:rotate(360deg); } }
+@media (prefers-reduced-motion:reduce) {
+  .stage,.trigger,.options button { transition:none; }
+  .spinner { animation:none; }
+}

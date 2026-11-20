@@ -1,0 +1,44 @@
+body:has(.focus-dock) .content { padding-bottom:130px; }
+.focus-launcher { gap:7px; white-space:nowrap; }
+.focus-dock { position:fixed; z-index:65; bottom:24px; left:calc(50% + var(--sidebar)/2); transform:translateX(-50%); display:flex; align-items:center; max-width:calc(100vw - var(--sidebar) - 40px); width:430px; min-height:70px; padding:8px; border:1px solid var(--border); border-radius:19px; background:var(--surface); color:var(--foreground); box-shadow:0 12px 45px #0002; }
+.focus-dock-open { display:flex; align-items:center; gap:12px; min-width:0; flex:1; padding:7px 9px; text-align:left; border-radius:12px; background:none; color:inherit; }
+.focus-dock-icon { display:grid; place-items:center; width:36px; height:36px; border-radius:50%; background:var(--surface-alt); flex-shrink:0; }
+.focus-dock-copy { display:grid; gap:4px; min-width:0; flex:1; }
+.focus-dock-copy small { color:var(--muted); font-size:10px; }
+.focus-dock-copy strong { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:12px; font-weight:500; }
+.focus-dock-time { font-variant-numeric:tabular-nums; font-size:18px; font-weight:500; letter-spacing:-.5px; }
+.focus-dock-control { display:grid; place-items:center; flex-shrink:0; width:44px; height:44px; border:1px solid var(--border); border-radius:13px; background:var(--surface-alt); color:var(--foreground); }
+.focus-dialog { padding:10px 0 2px; }
+.focus-eyebrow { color:var(--muted); font-size:10px; text-transform:uppercase; letter-spacing:.1em; text-align:center; margin:16px 0 12px; }
+.focus-task-title { font-size:20px; font-weight:500; line-height:1.5; text-align:center; overflow-wrap:anywhere; }
+.focus-clock { font-size:clamp(50px,12vw,76px); text-align:center; font-weight:400; font-variant-numeric:tabular-nums; letter-spacing:-4px; line-height:1.25; margin:24px 0; }
+.focus-progress { height:3px; background:var(--surface-alt); border-radius:3px; overflow:hidden; margin:0 26px; }
+.focus-progress span { display:block; height:100%; background:var(--foreground); }
+.focus-description { color:var(--muted); font-size:12px; line-height:1.8; max-width:340px; margin:22px auto 27px; text-align:center; }
+.focus-actions { display:flex; align-items:center; justify-content:center; gap:9px; flex-wrap:wrap; }
+.focus-actions .button { min-height:44px; gap:7px; }
+.focus-setup-mark { display:grid; place-items:center; width:63px; height:63px; border:1px solid var(--border); border-radius:20px; margin:4px 0 26px; background:var(--surface-alt); }
+.focus-label { display:block; font-size:13px; font-weight:500; margin-bottom:11px; }
+.focus-select { width:100%; min-height:48px; padding:12px; border:1px solid var(--border); border-radius:12px; background:var(--surface-alt); color:var(--foreground); font-size:13px; }
+.focus-duration { border:0; padding:0; margin:26px 0 0; min-width:0; }
+.focus-duration legend { font-size:12px; margin-bottom:12px; }
+.focus-duration-options { display:flex; gap:8px; flex-wrap:wrap; }
+.focus-duration-options>button,.focus-duration-options>label { min-height:44px; border:1px solid var(--border); background:var(--surface); color:var(--foreground); border-radius:11px; padding:8px 14px; font-size:12px; }
+.focus-duration-options>button[aria-pressed="true"] { background:var(--foreground); color:var(--surface); border-color:var(--foreground); }
+.focus-duration-options>label { display:flex; gap:5px; align-items:center; padding:6px 9px; }
+.focus-duration-options input { width:42px; padding:3px 0; background:none; border:0; color:var(--foreground); font-size:12px; text-align:center; }
+.focus-duration-options label span { font-size:10px; color:var(--muted); }
+.focus-duration p,.focus-local-note { color:var(--muted); font-size:10px; line-height:1.8; margin-top:12px; }
+.focus-dialog>.focus-actions { margin-top:26px; }
+.focus-local-note { text-align:center; max-width:330px; margin:18px auto 0; }
+.focus-before-start { display:flex; align-items:center; gap:12px; background:var(--surface-alt); border-radius:12px; padding:14px; margin:22px 0; }
+.focus-before-start>span { display:flex; flex:1; justify-content:space-between; gap:12px; font-size:11px; color:var(--muted); }
+.focus-before-start strong { color:var(--foreground); font-size:13px; font-weight:500; font-variant-numeric:tabular-nums; }
+.focus-empty { text-align:center; padding:18px 4px; }
+.focus-empty>svg { margin:auto auto 18px; }
+.focus-empty h3 { font-size:22px; font-weight:500; }
+.focus-empty p { color:var(--muted); font-size:12px; line-height:1.8; max-width:300px; margin:12px auto 25px; }
+.focus-end-confirm { border-top:1px solid var(--border); padding-top:17px; }
+.focus-end-confirm>p { font-size:12px; line-height:1.8; text-align:center; margin-bottom:17px; }
+@media(max-width:760px) { body:has(.focus-dock) .content { padding-bottom:210px; } .focus-dock { left:50%; bottom:calc(87px + env(safe-area-inset-bottom)); width:calc(100vw - 30px); max-width:450px; min-height:66px; } .focus-dock-time { font-size:17px; } .focus-duration-options { gap:6px; } .focus-duration-options>button { padding-inline:12px; } .focus-dialog input,.focus-dialog select { font-size:16px; } }
+@media(max-width:360px) { .focus-dock { width:calc(100vw - 20px); } .focus-dock-open { gap:8px; padding-inline:4px; } .focus-dock-icon { width:30px; height:30px; } .focus-dock-copy strong { font-size:11px; } .focus-duration-options>button { padding-inline:10px; } .focus-duration-options>label { padding-inline:6px; } }

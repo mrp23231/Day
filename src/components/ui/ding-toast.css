@@ -1,0 +1,17 @@
+.day-notifications .tst-viewport {
+  --tst-bg: var(--surface);
+  --tst-fg: var(--foreground);
+  --tst-success: var(--foreground);
+  --tst-error: var(--foreground);
+  --tst-warning: var(--foreground);
+  --tst-info: var(--foreground);
+  --tst-pad: 20px;
+  --tst-shadow: 0 0 0 1px var(--border), 0 8px 32px #00000012;
+  font-family: inherit;
+  font-size: 13px;
+  line-height: 1.45;
+}
+.day-notifications .tst-copy { max-width: min(380px, calc(100vw - 108px)); }
+.day-notifications .tst-action { min-height: 36px; }
+.day-notifications .tst-close { width: 36px; height: 36px; }
+.day-notifications .tst-desc { font-size: 12px; opacity: .72; }

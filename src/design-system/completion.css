@@ -1,0 +1,92 @@
+/* Completion control: native input, finite visual feedback, no idle animation. */
+.day-check { display:inline-flex; align-items:center; flex-shrink:0; gap:8px; vertical-align:middle; cursor:pointer; }
+.day-check-target { position:relative; display:grid; place-items:center; width:34px; height:36px; flex-shrink:0; }
+.day-check-input { position:absolute; inset:0; width:100%; height:100%; margin:0; opacity:0; cursor:inherit; z-index:2; }
+.day-check-frame { position:relative; display:grid; place-items:center; width:21px; height:21px; border:1.5px solid color-mix(in srgb,var(--muted) 48%,var(--border)); border-radius:6px; background:var(--surface); color:var(--primary-foreground); transition:background .18s,border-color .18s,box-shadow .18s; }
+.day-check:hover .day-check-frame { border-color:var(--primary); box-shadow:0 0 0 4px color-mix(in srgb,var(--primary) 7%,transparent); }
+.day-check-input:focus-visible { outline:none; }
+.day-check-input:focus-visible + .day-check-frame { outline:2px solid var(--primary); outline-offset:4px; }
+.day-check[data-checked="true"] .day-check-frame { background:var(--primary); border-color:var(--primary); }
+.day-check-mark { opacity:0; transform:scale(.6); transition:opacity .15s,transform .2s; }
+.day-check[data-checked="true"] .day-check-mark { opacity:1; transform:scale(1); }
+.day-check[data-disabled="true"] { opacity:.35; cursor:not-allowed; }
+.day-check[data-disabled="true"] .day-check-frame { box-shadow:none; }
+.day-check-label { font-size:14px; }
+.day-check-md .day-check-target { width:40px; height:40px; }
+.day-check-md .day-check-frame { width:28px; height:28px; border-radius:8px; }
+.day-check-md .day-check-mark { width:19px; height:19px; }
+.day-check-burst { position:absolute; inset:0; pointer-events:none; color:var(--primary); animation:day-check-pop .28s ease-out; }
+.day-check-ring { position:absolute; inset:-3px; border:1px solid currentColor; border-radius:8px; animation:day-check-ring .55s ease-out both; }
+.day-check-burst i { position:absolute; left:50%; top:50%; width:3px; height:3px; border-radius:50%; background:currentColor; opacity:0; animation:day-check-particle .55s ease-out both; }
+@keyframes day-check-pop { 0% { box-shadow:0 0 14px 4px color-mix(in srgb,var(--primary) 25%,transparent); } 100% { box-shadow:0 0 0 0 transparent; } }
+@keyframes day-check-ring { from { opacity:.55; transform:scale(.8); } to { opacity:0; transform:scale(1.7); } }
+@keyframes day-check-particle { 0% { opacity:.8; transform:translate(-50%,-50%) rotate(var(--particle-angle)) translateX(10px) scale(1); } 100% { opacity:0; transform:translate(-50%,-50%) rotate(var(--particle-angle)) translateX(23px) scale(0); } }
+.habit-history-check { display:flex; flex-direction:column; align-items:center; gap:3px; }
+.habit-history-date { font-size:10px; color:var(--muted); line-height:1; }
+.habit-week .day-check-target { width:34px; height:36px; }
+.task-row > .day-check { margin-left:-7px; }
+.habit-row > .day-check { margin-right:-7px; }
+
+/* The supplied six-column bento, populated with actual daily records. */
+.stats-bento { display:grid; grid-template-columns:repeat(6,minmax(0,1fr)); grid-template-rows:116px 104px; gap:12px; margin:0 0 36px; }
+.stats-bento > a { border-radius:12px; min-width:0; transition:box-shadow .18s,transform .18s; }
+.stats-bento > a:hover { box-shadow:0 0 0 1px var(--border); }
+.bento-primary { color:var(--primary-foreground); background:var(--primary); position:relative; isolation:isolate; grid-column:span 3; grid-row:span 2; overflow:hidden; padding:25px 28px; display:flex; flex-direction:column; }
+.bento-card-head { display:flex; justify-content:space-between; align-items:center; }
+.bento-card-head > svg { opacity:.6; }
+.bento-badge { font-size:10px; font-weight:550; letter-spacing:1.1px; text-transform:uppercase; opacity:.65; padding:0; }
+.bento-main-value { font-size:68px; letter-spacing:-3px; font-weight:450; line-height:1.1; margin:18px 0 0; font-variant-numeric:tabular-nums; }
+.bento-main-value > span { font-size:38px; letter-spacing:-1px; margin-left:3px; opacity:.6; }
+.bento-primary-foot { display:flex; align-items:flex-end; justify-content:space-between; gap:20px; margin-top:auto; }
+.bento-primary-foot p { font-size:13px; line-height:1.45; opacity:.85; }
+.bento-primary-foot > span { font-size:10px; opacity:.65; text-align:right; }
+.bento-tasks { grid-column:span 3; padding:20px 24px; display:flex; justify-content:space-between; align-items:center; gap:24px; }
+.bento-label { display:block; color:var(--muted); font-size:10px; line-height:1.4; letter-spacing:.9px; text-transform:uppercase; font-weight:550; }
+.bento-value { font-size:29px; letter-spacing:-1px; line-height:1.3; font-weight:450; font-variant-numeric:tabular-nums; }
+.bento-value > span { color:var(--muted); font-size:18px; letter-spacing:-.5px; }
+.bento-task-copy small,.bento-water small { font-size:10px; color:var(--muted); }
+.bento-history { min-width:110px; width:45%; max-width:160px; }
+.bento-bars { display:flex; gap:6px; height:52px; }
+.bento-bar-column { display:flex; flex:1; min-width:0; align-items:center; flex-direction:column; justify-content:flex-end; gap:5px; }
+.bento-bar-track { height:34px; width:7px; background:color-mix(in srgb,var(--foreground) 7%,transparent); border-radius:3px; overflow:hidden; display:flex; align-items:flex-end; }
+.bento-bar-track > span { width:100%; background:var(--foreground); border-radius:3px; transition:height .3s; }
+.bento-bar-column > span { font-size:8px; line-height:1; color:var(--muted); }
+.bento-history > p { font-size:9px; color:var(--muted); margin-top:7px; text-align:center; }
+.bento-habits { grid-column:span 1; padding:18px 12px; display:flex; flex-direction:column; justify-content:center; text-align:center; gap:3px; }
+.bento-water { grid-column:span 2; padding:19px 20px; display:flex; align-items:center; gap:14px; position:relative; }
+.bento-water-icon { display:grid; place-items:center; width:40px; height:40px; flex-shrink:0; color:var(--blue-ink); border-radius:50%; background:var(--surface); }
+.bento-water-value { font-size:23px; letter-spacing:-.8px; line-height:1.4; font-variant-numeric:tabular-nums; }
+.bento-water-value > span { font-size:13px; letter-spacing:-.2px; color:var(--muted); }
+.bento-water-arrow { position:absolute; right:14px; top:14px; color:var(--muted); }
+@media(max-width:1100px) {
+  .bento-primary { padding:23px; }
+  .bento-tasks { padding:18px; gap:16px; }
+  .bento-primary-foot > span { max-width:80px; }
+  .bento-water { padding:18px 14px; gap:10px; }
+  .bento-water-icon { width:32px; height:32px; }
+  .bento-water .bento-label { font-size:9px; letter-spacing:.5px; }
+}
+@media(max-width:760px) {
+  .stats-bento { grid-template-columns:repeat(2,minmax(0,1fr)); grid-template-rows:190px 116px 104px; gap:10px; margin-bottom:28px; }
+  .bento-primary { grid-column:span 2; grid-row:span 1; padding:22px 24px; }
+  .bento-main-value { font-size:56px; margin-top:12px; }
+  .bento-main-value > span { font-size:32px; }
+  .bento-primary-foot { align-items:center; }
+  .bento-primary-foot p br { display:none; }
+  .bento-primary-foot > span { max-width:none; }
+  .bento-tasks { grid-column:span 2; padding:20px 24px; }
+  .bento-habits { grid-column:span 1; }
+  .bento-water { grid-column:span 1; padding:16px; gap:10px; }
+  .bento-water-arrow { display:none; }
+  .bento-water-icon { width:30px; height:30px; }
+  .bento-water-value { font-size:22px; }
+}
+@media(max-width:390px) {
+  .bento-water { gap:8px; padding:12px; }
+  .bento-water-icon { display:none; }
+}
+@media(prefers-reduced-motion:reduce) {
+  .day-check *, .stats-bento > a, .bento-bar-track > span { animation:none !important; transition:none !important; }
+  .day-check-burst { display:none; }
+  .stats-bento > a:hover { transform:none; }
+}

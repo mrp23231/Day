@@ -1,0 +1,7 @@
+import { preferencesSchema, taskDone, taskOnDate, type Task, type calculateNutrition } from "./domain";
+type Stamp={scope:string;generation:number;mutation:number};
+export function currentCloudOperation(start:Stamp,current:Stamp){return start.scope===current.scope&&start.generation===current.generation;}
+export function canRestoreCloud(start:Stamp,current:Stamp,hasLocal:boolean){return currentCloudOperation(start,current)&&start.mutation===current.mutation&&!hasLocal;}
+export function filterTasksForDate(tasks:Task[],date:string,query:string,filter:string){return tasks.filter(t=>taskOnDate(t,date)&&(!query||`${t.title} ${t.description}`.toLocaleLowerCase("ru").includes(query.toLocaleLowerCase("ru")))&&(filter==="all"||filter==="done"&&taskDone(t,date)||filter==="active"&&!taskDone(t,date)||filter==="high"&&t.priority==="high"));}
+export function nutritionTargets(result:ReturnType<typeof calculateNutrition>){const targets={calorieGoal:result.calories,proteinGoal:result.protein,fatGoal:result.fat,carbsGoal:result.carbs,calorieGoalSet:true as const};const parsed=preferencesSchema.pick({calorieGoal:true,proteinGoal:true,fatGoal:true,carbsGoal:true,calorieGoalSet:true}).safeParse(targets);return parsed.success?parsed.data:null;}
+export function recoveryRequested(url:string,authenticated:boolean){const parsed=new URL(url);return authenticated&&(parsed.searchParams.get("recovery")==="1"||parsed.hash.includes("type=recovery"));}

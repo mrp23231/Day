@@ -1,0 +1,39 @@
+.surface {
+  --personal-photo-opacity: .2;
+}
+
+.surface[data-photo-target="next"] {
+  --personal-photo-opacity: .3;
+}
+
+.photo {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+  filter: var(--personal-filter);
+  opacity: 0;
+  transform: scale(1.025);
+  transition: opacity 520ms cubic-bezier(.2,.7,.2,1), transform 700ms cubic-bezier(.2,.7,.2,1);
+}
+
+.photo[data-photo-state="visible"] {
+  opacity: var(--personal-photo-opacity);
+  transform: scale(1);
+}
+
+.photo[data-photo-state="previous"] {
+  opacity: 0;
+  transform: scale(1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .photo {
+    transition: none;
+    transform: none;
+  }
+}

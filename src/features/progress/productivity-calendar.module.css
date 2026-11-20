@@ -1,0 +1,72 @@
+.calendar { margin-bottom:26px; padding:27px; --pc-green:#7ca787; --pc-yellow:#d7b469; --pc-red:#c5847e; --pc-neutral:color-mix(in srgb,var(--muted) 15%,var(--surface)); }
+:global(html[data-theme="dark"]) .calendar { --pc-green:#6d9f7a; --pc-yellow:#bca05d; --pc-red:#af736d; }
+.header { display:flex; justify-content:space-between; align-items:center; gap:14px; margin-bottom:24px; }
+.kicker { display:flex; align-items:center; gap:6px; font-size:9px; font-weight:600; letter-spacing:.11em; text-transform:uppercase; color:var(--muted); margin-bottom:9px; }
+.header h2 { font-size:22px; letter-spacing:-.65px; font-weight:550; }
+.header p { font-size:11px; margin-top:6px; color:var(--muted); }
+.viewSwitch { display:flex; padding:3px; gap:2px; border:1px solid var(--border); border-radius:10px; background:var(--surface-alt); flex:none; }
+.viewSwitch button { display:flex; align-items:center; gap:5px; border-radius:7px; padding:7px 10px; background:none; color:var(--muted); font-size:10px; }
+.viewSwitch button[aria-pressed="true"] { background:var(--foreground); color:var(--surface); }
+.toolbar { display:flex; align-items:center; justify-content:space-between; gap:14px; border-bottom:1px solid var(--border); padding-bottom:18px; }
+.periods { display:flex; background:var(--surface-alt); border-radius:9px; padding:3px; gap:2px; }
+.periods button { padding:7px 12px; background:none; border-radius:7px; font-size:10px; color:var(--muted); }
+.periods button[aria-pressed="true"] { background:var(--surface); color:var(--foreground); box-shadow:0 1px 5px #00000009; }
+.navigation { display:flex; align-items:center; gap:3px; }
+.navigation span { min-width:150px; text-align:center; font-size:11px; font-weight:500; text-transform:capitalize; }
+.navigation button { width:30px; height:30px; }
+.stats { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; margin:22px 0 25px; }
+.stats > div { display:flex; flex-direction:column; gap:4px; }
+.stats > div+div { padding-left:24px; border-left:1px solid var(--border); }
+.stats strong { font-size:30px; font-weight:500; letter-spacing:-1px; line-height:1.2; font-variant-numeric:tabular-nums; }
+.stats span { font-size:10px; color:var(--muted); }
+.visual { animation:reveal .2s ease-out; }
+.weekdays,.monthGrid,.weekGrid { display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); gap:7px; }
+.weekdays { margin-bottom:8px; }
+.weekdays span { text-align:center; text-transform:uppercase; color:var(--muted); font-size:9px; }
+.day { --day-fill:var(--pc-neutral); display:flex; flex-direction:column; align-items:flex-start; position:relative; min-width:0; min-height:66px; padding:10px 11px; border-radius:9px; background:color-mix(in srgb,var(--day-fill) 15%,var(--surface)); border:1px solid color-mix(in srgb,var(--day-fill) 35%,var(--border)); transition:background .15s,transform .15s; font-variant-numeric:tabular-nums; text-align:left; }
+.day::after { content:""; width:5px; height:5px; border-radius:2px; background:var(--day-fill); position:absolute; right:10px; bottom:12px; }
+.day[data-status="complete"],.legend i[data-status="complete"] { --day-fill:var(--pc-green); }
+.day[data-status="partial"],.legend i[data-status="partial"] { --day-fill:var(--pc-yellow); }
+.day[data-status="low"],.legend i[data-status="low"] { --day-fill:var(--pc-red); }
+.day[data-status="future"] { opacity:.5; }
+.day:hover { background:color-mix(in srgb,var(--day-fill) 28%,var(--surface)); }
+.day[aria-pressed="true"] { outline:1.5px solid var(--foreground); outline-offset:2px; }
+.day[aria-current="date"] .dayNumber { font-weight:750; text-decoration:underline; text-underline-offset:3px; }
+.dayNumber { font-size:12px; line-height:1; }
+.dayCount { font-size:9px; color:var(--muted); margin-top:auto; padding-top:9px; max-width:calc(100% - 9px); }
+.day .dayIcon { position:absolute; width:22px; height:22px; right:7px; top:6px; border-radius:7px; object-fit:cover; }
+.weekday { font-size:9px; color:var(--muted); margin-bottom:12px; }
+.weekGrid .day { min-height:110px; }
+.weekGrid .day .dayIcon { top:32px; width:20px; height:20px; }
+.yearGrid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:24px 22px; }
+.miniMonth { min-width:0; }
+.miniMonth h3 { font-size:11px; font-weight:550; text-transform:capitalize; margin-bottom:12px; }
+.miniMonth .weekdays,.miniMonth .monthGrid { gap:3px; }
+.miniMonth .weekdays { margin-bottom:5px; }
+.miniMonth .weekdays span { font-size:7px; }
+.compactDay { align-items:center; justify-content:center; padding:0; min-height:0; aspect-ratio:1; border-radius:3px; background:var(--day-fill); border-color:transparent; }
+.compactDay::after { display:none; }
+.compactDay .dayNumber { font-size:8px; color:var(--foreground); }
+.legend { display:flex; gap:16px; flex-wrap:wrap; margin:20px 0; color:var(--muted); font-size:9px; }
+.legend > span { display:flex; align-items:center; gap:5px; }
+.legend i { --day-fill:var(--pc-neutral); width:9px; height:9px; display:block; border-radius:2px; background:var(--day-fill); }
+.selected { display:flex; flex-wrap:wrap; align-items:center; gap:14px; padding-top:20px; border-top:1px solid var(--border); }
+.selectedIdentity { display:flex; align-items:center; gap:12px; flex:1; min-width:210px; }
+.dateEmblem { width:41px; height:45px; border:1px solid var(--border); border-radius:11px; display:grid; place-items:center; background:var(--surface-alt); color:var(--muted); flex:none; position:relative; overflow:hidden; }
+.dateEmblem .selectedPhoto { width:100%; height:100%; object-fit:cover; position:absolute; inset:0; z-index:1; }
+.selectedIdentity strong { display:block; font-size:12px; font-weight:550; text-transform:capitalize; }
+.selectedIdentity div > span { display:block; margin-top:4px; font-size:10px; }
+.selectedIdentity small { display:block; font-size:9px; color:var(--muted); margin-top:4px; }
+.dayNavigation { display:flex; align-items:center; gap:2px; }
+.dayNavigation input { width:125px; font-size:11px; border:1px solid var(--border); border-radius:7px; background:var(--surface); color:var(--foreground); padding:7px; min-height:32px; }
+.dayNavigation button { width:30px; height:32px; }
+.dayNavigation button:disabled { opacity:.3; cursor:default; }
+.openPlan { display:flex; align-items:center; gap:4px; font-size:10px; color:var(--muted); }
+.openPlan:hover { color:var(--foreground); }
+@keyframes reveal { from { opacity:.3; } to { opacity:1; } }
+@media(max-width:1100px) { .yearGrid { grid-template-columns:repeat(3,minmax(0,1fr)); } .toolbar { flex-wrap:wrap; } .navigation { margin-left:auto; } }
+@media(max-width:560px) { .calendar { padding:20px 17px; } .header { gap:10px; align-items:flex-start; } .header h2 { font-size:18px; letter-spacing:-.4px; } .header p { font-size:10px; line-height:1.6; } .viewSwitch button { padding:7px 8px; } .viewSwitch button svg { display:none; } .toolbar { gap:12px; } .periods { width:100%; } .periods button { flex:1; } .navigation { width:100%; justify-content:space-between; margin:0; } .stats { gap:8px; margin:20px 0; } .stats strong { font-size:25px; } .stats > div+div { padding-left:11px; } .stats span { font-size:9px; line-height:1.5; } .monthGrid,.weekGrid,.weekdays { gap:5px; } .day { min-height:57px; padding:8px 5px; border-radius:6px; } .dayNumber { font-size:11px; } .dayCount { font-size:7px; letter-spacing:-.2px; } .day::after { right:5px; bottom:9px; width:3px; height:3px; } .day .dayIcon { width:15px; height:15px; right:4px; top:4px; border-radius:4px; } .weekGrid .day .dayIcon { top:31px; width:13px; height:13px; } .weekGrid .day { min-height:102px; } .weekday { font-size:8px; } .yearGrid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:23px 17px; } .compactDay { min-height:0; padding:0; border-radius:3px; } .compactDay .dayNumber { font-size:8px; } .legend { gap:9px 12px; font-size:8px; } .selectedIdentity { min-width:0; width:100%; flex-basis:100%; } .dayNavigation { margin-left:-5px; } .openPlan { margin-left:auto; } }
+@media(pointer:coarse) { .viewSwitch button,.periods button { min-height:38px; } .navigation button,.dayNavigation button { width:40px; height:44px; } .dayNavigation input { min-height:44px; font-size:14px; width:140px; } .openPlan { min-height:44px; } }
+@media(prefers-reduced-motion:reduce) { .visual { animation:none; } .day { transition:none; } }
+
+.day .dayIcon:not(:has(img)) { display:none; }

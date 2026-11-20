@@ -1,0 +1,72 @@
+/* Personal backgrounds remain behind an opaque, readable content system. */
+.day-background-layer { display:none; }
+html[data-background]:not([data-background="classic"]) .main { background:transparent; isolation:isolate; min-height:100dvh; }
+html[data-background]:not([data-background="classic"]) .day-background-layer { display:block; position:fixed; inset:0 0 0 var(--sidebar); z-index:-1; pointer-events:none; background:#eeeeee; }
+html[data-theme="dark"][data-background]:not([data-background="classic"]) .day-background-layer { background:#191919; }
+html[data-background="mountains"] .day-background-layer::before,html[data-background="architecture"] .day-background-layer::before { content:""; position:absolute; inset:0; background-position:center; background-size:cover; background-repeat:no-repeat; filter:grayscale(1); opacity:.18; }
+html[data-theme="light"]:is([data-background="mountains"],[data-background="architecture"]) { --muted:#4f4f4f; }
+html[data-background="mountains"] .day-background-layer::before { background-image:url('/backgrounds/mountains.jpg'); }
+html[data-background="architecture"] .day-background-layer::before { background-image:url('/backgrounds/architecture.jpg'); background-position:center 55%; opacity:.19; }
+html[data-theme="dark"][data-background="mountains"] .day-background-layer::before { opacity:.12; }
+html[data-theme="dark"][data-background="architecture"] .day-background-layer::before { opacity:.09; }
+html[data-background]:not([data-background="classic"]) .topbar { border-color:color-mix(in srgb,var(--muted) 20%,transparent); }
+html[data-background]:not([data-background="classic"]) .today-progress { background:var(--surface); }
+.app-theme-toggle { flex-shrink:0; }
+.appearance-panel { overflow:hidden; }
+.appearance-heading { display:flex; align-items:center; justify-content:space-between; gap:18px; padding-bottom:22px; border-bottom:1px solid var(--border); }
+.appearance-eyebrow { font-size:10px; color:var(--muted); margin-bottom:6px; letter-spacing:.2px; }
+.appearance-heading h2 { font-size:22px; font-weight:500; letter-spacing:-.6px; }
+.appearance-monogram { display:grid; place-items:center; width:42px; height:42px; border:1px solid var(--border); border-radius:13px; font-size:22px; font-weight:550; letter-spacing:-1.4px; background:var(--surface-alt); }
+.appearance-theme-row { display:flex; justify-content:space-between; align-items:center; gap:18px; padding:23px 0 18px; }
+.appearance-theme-row strong { font-size:14px; font-weight:500; }
+.appearance-theme-row p { font-size:11px; line-height:1.8; color:var(--muted); margin-top:5px; max-width:230px; }
+.appearance-theme-row .day-theme-toggle { background:var(--surface-alt); border:1px solid var(--border); white-space:nowrap; }
+.appearance-automatic { display:flex; align-items:center; justify-content:space-between; gap:15px; padding:13px 15px; border:1px solid var(--border); border-radius:11px; font-size:12px; cursor:pointer; }
+.appearance-automatic>span { display:flex; align-items:center; gap:9px; }
+.appearance-automatic svg { color:var(--muted); }
+.appearance-automatic input { width:17px; height:17px; cursor:pointer; accent-color:var(--foreground); }
+.appearance-backgrounds { border:0; padding:0; margin:27px 0 0; min-width:0; }
+.appearance-backgrounds legend { font-size:14px; font-weight:500; padding:0; }
+.appearance-description { font-size:11px; color:var(--muted); margin:6px 0 17px; line-height:1.8; }
+.background-options { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:18px 14px; }
+.background-option { position:relative; display:flex; flex-direction:column; min-width:0; cursor:pointer; }
+.background-option>input { position:absolute; inset:0; width:100%; height:100%; opacity:0; z-index:1; margin:0; cursor:pointer; }
+.background-option>input:disabled { cursor:default; }
+.background-swatch { position:relative; display:block; height:98px; border-radius:12px; background-size:cover; background-position:center; border:1px solid var(--border); filter:grayscale(1); }
+.background-swatch-classic { background:var(--surface); }
+.background-swatch-soft { background:#e8e8e8; }
+html[data-theme="dark"] .background-swatch-soft { background:#303030; }
+.background-swatch-architecture { background-position:center 55%; }
+.background-selected { position:absolute; right:8px; bottom:8px; display:grid; place-items:center; width:23px; height:23px; border-radius:50%; background:var(--foreground); color:var(--background); opacity:0; }
+.background-option.selected .background-selected { opacity:1; }
+.background-option.selected .background-swatch { outline:1px solid var(--foreground); outline-offset:3px; }
+.background-option:has(input:focus-visible) .background-swatch { outline:2px solid var(--foreground); outline-offset:4px; }
+.background-option:has(input:disabled) { opacity:.5; cursor:default; }
+.background-name { display:block; font-size:12px; font-weight:500; margin-top:10px; }
+.background-description { font-size:10px; line-height:1.7; color:var(--muted); margin-top:3px; overflow-wrap:anywhere; }
+.appearance-credit { font-size:10px; color:var(--muted); margin-top:18px; min-height:18px; line-height:1.8; }
+.appearance-credit a:hover { color:var(--foreground); text-decoration:underline; }
+.appearance-nutrition { margin-top:22px; border-top:1px solid var(--border); padding-bottom:0; }
+.appearance-nutrition .segmented { flex-shrink:0; }
+@media (min-width:1201px) {
+  .settings-layout:has(.appearance-panel) { grid-template-columns:minmax(0,1.2fr) minmax(320px,1fr); }
+  .background-options { grid-template-columns:repeat(4,minmax(0,1fr)); }
+  .background-swatch { height:84px; }
+}
+@media (max-width:760px) {
+  .appearance-theme-row { gap:12px; }
+  .appearance-theme-row strong { font-size:13px; }
+  .appearance-theme-row p { font-size:11px; max-width:175px; }
+  .appearance-heading h2 { font-size:21px; }
+  .background-swatch { height:100px; }
+  .appearance-nutrition { padding-top:20px; }
+  .appearance-nutrition .segmented { margin-left:auto; }
+}
+@media (max-width:380px) {
+  .appearance-theme-row { align-items:flex-start; }
+  .appearance-theme-row .day-theme-toggle { padding-inline:10px; gap:6px; min-width:94px; }
+  .appearance-theme-row p { font-size:10px; }
+  .background-options { gap:16px 12px; }
+  .background-swatch { height:82px; }
+  .background-description { font-size:9px; }
+}

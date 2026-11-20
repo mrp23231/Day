@@ -1,0 +1,74 @@
+.onboarding { min-width:0; color:var(--foreground); }
+.topline { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:22px; }
+.wordmark { font-size:22px; font-weight:650; letter-spacing:-1.3px; line-height:1; }
+.wordmark > span { color:var(--muted); }
+.stepCount { color:var(--muted); font-size:9px; letter-spacing:1px; font-variant-numeric:tabular-nums; }
+.progress { display:flex; gap:6px; list-style:none; padding:0; margin:0 0 31px; }
+.progress > li { height:3px; flex:1; background:var(--border); border-radius:3px; transition:background .24s; }
+.progress > .progressActive { background:var(--foreground); }
+.stage { min-width:0; }
+.form { display:flex; flex-direction:column; }
+.heading { margin-bottom:25px; }
+.eyebrow { color:var(--muted); text-transform:uppercase; letter-spacing:1.6px; font-size:8px; font-weight:600; margin-bottom:11px; }
+.title { font-size:29px; font-weight:530; line-height:1.2; letter-spacing:-1.05px; overflow-wrap:anywhere; }
+.title:focus { outline:none; }
+.description { color:var(--muted); font-size:11px; line-height:1.8; margin-top:12px; max-width:360px; text-wrap:pretty; }
+.nameSection { display:flex; flex-direction:column; min-width:0; margin-bottom:31px; }
+.nameArt { position:relative; align-self:center; display:grid; place-items:center; width:78px; height:78px; border:1px solid var(--border); border-radius:26px; background:var(--surface-alt); margin:1px 0 25px; }
+.nameArt > span { font-size:30px; font-weight:400; color:var(--foreground); }
+.nameArt > i { position:absolute; right:-8px; bottom:-6px; display:grid; place-items:center; width:28px; height:28px; color:var(--primary-foreground); background:var(--primary); border:4px solid var(--surface); border-radius:50%; }
+.label { font-size:11px; font-weight:550; margin-bottom:9px; }
+.nameInput { display:block; width:100%; min-width:0; border:1px solid var(--border); border-radius:11px; background:var(--surface); color:var(--foreground); padding:14px; font-size:14px; }
+.nameInput::placeholder { color:var(--muted); }
+.nameInput:focus-visible { outline:2px solid var(--foreground); outline-offset:3px; }
+.hint { margin-top:8px; color:var(--muted); font-size:9px; }
+.choices { display:grid; gap:9px; padding:0; border:0; min-width:0; margin:0 0 28px; }
+.option { display:flex; align-items:center; gap:13px; position:relative; padding:14px; border:1px solid var(--border); border-radius:13px; cursor:pointer; transition:border-color .15s,background .15s; min-width:0; }
+.option:hover { background:var(--surface-alt); }
+.option.selected { border-color:var(--foreground); background:var(--surface-alt); }
+.option:has(input:focus-visible) { outline:2px solid var(--foreground); outline-offset:3px; }
+.option > input { position:absolute; opacity:0; width:1px; height:1px; margin:0; }
+.optionIcon { flex-shrink:0; width:33px; height:33px; display:grid; place-items:center; border-radius:10px; color:var(--muted); background:var(--surface-alt); }
+.selected .optionIcon { color:var(--foreground); }
+.optionText { min-width:0; flex:1; }
+.optionText > strong { font-size:12px; font-weight:550; display:block; }
+.optionText > small { display:block; margin-top:4px; font-size:9px; line-height:1.55; color:var(--muted); }
+.optionCheck { display:grid; place-items:center; flex-shrink:0; width:16px; height:16px; border:1px solid var(--border); border-radius:50%; color:var(--primary-foreground); }
+.selected .optionCheck { background:var(--primary); border-color:var(--primary); }
+.actions { display:flex; gap:10px; align-items:center; }
+.primary { min-height:44px; flex:1; white-space:normal; font-size:11px; }
+.back { min-height:44px; padding-inline:0 12px; }
+.footer { display:flex; gap:8px 15px; flex-wrap:wrap; align-items:center; justify-content:space-between; border-top:1px solid var(--border); margin-top:21px; padding-top:16px; color:var(--muted); font-size:9px; }
+.footer > button { background:none; padding:4px 0; font-size:9px; color:var(--muted); text-decoration:underline; text-underline-offset:3px; }
+.footer > button:hover { color:var(--foreground); }
+.error { font-size:11px; margin-bottom:15px; color:var(--foreground); padding:12px; border:1px solid var(--border); border-radius:9px; }
+.welcome { text-align:center; display:flex; flex-direction:column; align-items:center; padding:0 3px 4px; }
+.welcomeArt { position:relative; display:grid; place-items:center; width:190px; height:152px; margin:0 auto 23px; }
+.orbitOuter,.orbitInner { position:absolute; border:1px solid var(--border); border-radius:50%; }
+.orbitOuter { width:146px; height:146px; }
+.orbitInner { width:112px; height:112px; border-style:dashed; opacity:.65; }
+.welcomeMark { display:grid; place-items:center; height:78px; width:78px; background:var(--primary); color:var(--primary-foreground); border-radius:25px; transform:rotate(-6deg); }
+.welcomeDot { position:absolute; width:9px; height:9px; border-radius:50%; background:var(--foreground); top:12px; right:43px; box-shadow:0 0 0 6px var(--surface); }
+.welcomeCross { position:absolute; color:var(--muted); left:17px; bottom:20px; font-size:21px; font-weight:300; background:var(--surface); line-height:1; padding:3px; }
+.welcome .title { max-width:100%; font-size:31px; }
+.welcome .description { max-width:330px; margin-top:16px; }
+.receipt { display:flex; flex-wrap:wrap; gap:7px; align-items:center; justify-content:center; margin:22px 0 29px; }
+.receipt > span { display:inline-flex; align-items:center; gap:6px; background:var(--surface-alt); border:1px solid var(--border); border-radius:30px; padding:6px 10px; font-size:9px; color:var(--muted); }
+.welcome > .primary { width:100%; flex:none; }
+.footnote { color:var(--muted); font-size:9px; margin-top:15px; }
+@media (max-width:380px) {
+  .progress { margin-bottom:26px; }
+  .title,.welcome .title { font-size:27px; }
+  .option { gap:9px; padding:12px 10px; }
+  .optionIcon { width:27px; }
+  .optionText > small { font-size:9px; }
+  .back { gap:5px; font-size:10px; padding-right:4px; }
+  .actions { gap:8px; }
+  .primary { padding-inline:12px; font-size:10px; }
+  .welcomeArt { height:135px; margin-bottom:19px; }
+  .orbitOuter { width:132px; height:132px; }
+  .orbitInner { width:103px; height:103px; }
+}
+@media (prefers-reduced-motion:reduce) {
+  .onboarding *, .onboarding *::before, .onboarding *::after { transition:none!important; animation:none!important; }
+}

@@ -1,0 +1,49 @@
+/* Theme toggle and organic reveal adapted from 000h by Cojeev (MIT).
+   https://cojeev.com/ui/docs/theme-toggle/ */
+.day-theme-toggle.button {
+  min-width: 112px;
+  min-height: 44px;
+  height: 44px;
+  padding: 0 16px;
+  gap: 8px;
+  flex-shrink: 0;
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--foreground);
+  box-shadow: inset 0 0 0 1px var(--border);
+  font-family: inherit;
+}
+.day-theme-toggle.button:hover { background: var(--surface-alt); }
+.day-theme-toggle.button:disabled { opacity: .5; }
+.day-theme-toggle [data-slot="theme-toggle-icon"] { flex: none; overflow: visible; }
+.day-theme-toggle .day-theme-toggle__label { font-size: 11px; font-weight: 550; line-height: 1; }
+.day-theme-toggle.button[data-label="hidden"] { min-width: 44px; width: 44px; padding: 0; }
+@media (max-width: 640px) {
+  .day-theme-toggle.button[data-responsive="true"] { min-width: 44px; width: 44px; padding: 0; }
+  .day-theme-toggle[data-responsive="true"] .day-theme-toggle__label { display: none; }
+}
+
+/* Motion updates the destination's organic contour; native snapshots retain it. */
+:root[data-theme-reveal]::view-transition { pointer-events: none; }
+:root[data-theme-reveal]::view-transition-group(root) {
+  animation: none;
+  background-image: var(--day-theme-glyph, none);
+  background-position: var(--day-theme-glyph-position, 0 0);
+  background-size: var(--day-theme-glyph-size, 0 0);
+  background-repeat: no-repeat;
+}
+:root[data-theme-reveal]::view-transition-image-pair(root) { isolation: isolate; }
+:root[data-theme-reveal]::view-transition-old(root),
+:root[data-theme-reveal]::view-transition-new(root) {
+  mix-blend-mode: normal;
+  opacity: 1;
+  mask-image: var(--day-theme-glyph-mask, none);
+  mask-size: 100% 100%;
+}
+:root[data-theme-reveal]::view-transition-old(root) { animation: none; z-index: 1; }
+:root[data-theme-reveal]::view-transition-new(root) {
+  animation: day-theme-retain 8s linear;
+  clip-path: var(--day-theme-clip);
+  z-index: 2;
+}
+@keyframes day-theme-retain { from { opacity: 1; } to { opacity: 1; } }
