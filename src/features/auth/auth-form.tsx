@@ -10,6 +10,7 @@ import { ButtonSignIn } from "@/components/ui/button-sign-in";
 import { useDay } from "@/components/day-provider";
 import { recoveryRequested } from "@/lib/state-policy";
 import { useAuthRequestScope, useGoogleSignIn } from "./account-entry";
+import { authErrorMessage } from "./auth-errors";
 
 type AuthMode = "login" | "signup" | "reset" | "update";
 type AuthFormProps = { initialMethod?: "email"; initialMode?: "login" | "signup" };
@@ -75,8 +76,8 @@ export function AuthForm({ initialMethod, initialMode = "signup" }: AuthFormProp
         closeModal();
         notify(t("Вы вошли в Day"));
       }
-    } catch {
-      if (current()) setError(t("Не удалось выполнить запрос. Проверьте данные, подключение и настройку сервиса."));
+    } catch (error) {
+      if (current()) setError(t(authErrorMessage(error, "Не удалось выполнить запрос. Проверьте данные, подключение и настройку сервиса.")));
     } finally {
       pending.current = false;
       if (current()) setBusy(false);

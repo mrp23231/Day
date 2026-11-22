@@ -12,6 +12,7 @@ vi.mock("./appearance", () => ({ AppearanceSettings: () => null }));
 vi.mock("./backup-import", () => ({ BackupImport: () => <div>Импорт копии</div> }));
 vi.mock("@/features/auth/account-entry", () => ({ AccountEntry: () => null }));
 beforeEach(() => {
+  history.replaceState(null, "", "/settings");
   mocks.signOut.mockReset().mockResolvedValue({ error: null });
   mocks.fetch.mockReset(); mocks.notify.mockReset();
   vi.stubGlobal("fetch", mocks.fetch);
@@ -19,6 +20,29 @@ beforeEach(() => {
 });
 afterEach(() => { cleanup(); vi.unstubAllGlobals(); });
 describe("scoped settings confirmations", () => {
+  it.each([
+    ["denied", "en", "Sign-in was cancelled. Try again or choose email."],
+    ["provider", "it", "Impossibile completare l'accesso con Google. Riprova o scegli l'email."],
+    ["1", "ru", "Не удалось завершить вход. Попробуйте войти снова или запросите новое письмо."],
+  ] as const)("shows a localized retry path for callback %s", (failure, locale, message) => {
+    history.replaceState(null, "", `/settings?auth_error=${failure}&error_description=private-details`);
+    render(<I18nProvider locale={locale}><Settings /></I18nProvider>);
+    expect(screen.getByRole("alert").textContent).toBe(message);
+    expect(mocks.day.openModal).not.toHaveBeenCalled();
+  });
+  it.each([
+    ["error=access_denied&error_description=private", "Sign-in was cancelled. Try again or choose email."],
+    ["error_code=oauth_error&error_description=private", "Could not complete Google sign-in. Try again or choose email."],
+  ])("recognizes auth error fragments after the server callback: %s", (fragment, message) => {
+    history.replaceState(null, "", `/settings?auth_error=1#${fragment}`);
+    render(<I18nProvider locale="en"><Settings /></I18nProvider>);
+    expect(screen.getByRole("alert").textContent).toBe(message);
+  });
+  it.each(["error=access_denied&error_code=otp_expired", "error_code=otp_expired"])("offers a new email for expired link fragments: %s", fragment => {
+    history.replaceState(null, "", `/settings?auth_error=1#${fragment}`);
+    render(<I18nProvider locale="en"><Settings /></I18nProvider>);
+    expect(screen.getByRole("alert").textContent).toBe("Could not complete sign-in. Try signing in again or request a new email.");
+  });
   it("discards destructive confirmations when the account changes", () => {
     const view = render(<Settings />);
     fireEvent.click(screen.getByRole("button", { name: "Удалить аккаунт" }));

@@ -9,11 +9,15 @@ import { calendarPlannerMessages } from "./calendar-planner";
 import { calendarProgressMessages } from "./calendar-progress";
 import { cloudSyncMessages } from "./cloud-sync";
 import { cloudPhotoMessages } from "./cloud-photos";
+import { nutritionAiMessages } from "./nutrition-ai";
+import { nutritionPortionMessages } from "./nutrition-portions";
+import { nutritionScreenMessages } from "./nutrition-screen";
+import { authMessages } from "./auth";
 import { intlLocales, locales, type Locale, type Messages, type Translator } from "./types";
 export type { Locale, Messages, Translator } from "./types";
 export { intlLocales, locales } from "./types";
 
-export const messages: Messages = { ...coreMessages, ...planningMessages, ...featureMessages, ...profileMessages, ...serverMessages, ...calendarHomeMessages, ...calendarPhotoMessages, ...calendarPlannerMessages, ...calendarProgressMessages, ...cloudSyncMessages, ...cloudPhotoMessages };
+export const messages: Messages = { ...coreMessages, ...planningMessages, ...featureMessages, ...profileMessages, ...serverMessages, ...calendarHomeMessages, ...calendarPhotoMessages, ...calendarPlannerMessages, ...calendarProgressMessages, ...cloudSyncMessages, ...cloudPhotoMessages, ...nutritionAiMessages, ...nutritionPortionMessages, ...nutritionScreenMessages, ...authMessages };
 export function resolveLocale(value: unknown): Locale {
   return typeof value === "string" && (locales as readonly string[]).includes(value) ? value as Locale : "ru";
 }

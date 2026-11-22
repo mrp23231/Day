@@ -43,4 +43,24 @@ describe("authentication callback", () => {
     expect(response.headers.get("location")).toBe("https://day.example/settings?auth_error=1");
     expect(exchangeCodeForSession).not.toHaveBeenCalled();
   });
+
+  it("classifies provider denial without exchanging a code or reflecting untrusted descriptions", async () => {
+    const response = await GET(new Request("https://day.example/auth/callback?error=access_denied&error_description=untrusted-secret&code=ignored"));
+    expect(response.headers.get("location")).toBe("https://day.example/settings?auth_error=denied");
+    expect(response.headers.get("cache-control")).toBe("no-store");
+    expect(exchangeCodeForSession).not.toHaveBeenCalled();
+    expect(connection).not.toHaveBeenCalled();
+  });
+
+  it("classifies other provider failures without accepting a supplied redirect", async () => {
+    const response = await GET(new Request("https://day.example/auth/callback?error=server_error&next=https://untrusted.example&error_description=private"));
+    expect(response.headers.get("location")).toBe("https://day.example/settings?auth_error=provider");
+    expect(exchangeCodeForSession).not.toHaveBeenCalled();
+  });
+
+  it("keeps an expired email link distinct from a provider denial", async () => {
+    const response = await GET(new Request("https://day.example/auth/callback?error=access_denied&error_code=otp_expired"));
+    expect(response.headers.get("location")).toBe("https://day.example/settings?auth_error=1");
+    expect(exchangeCodeForSession).not.toHaveBeenCalled();
+  });
 });

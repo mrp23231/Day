@@ -14,6 +14,7 @@ import { AccountOnboarding } from "@/features/auth/account-onboarding";
 import { Editors } from "@/features/editors/editors";
 import { usePersonalPhotos } from "@/features/appearance/personal-photos";
 import { AppReadyContent } from "./app-ready-content";
+import { PageTransition } from "./page-transition";
 const links=[{href:"/",label:"Сегодня",icon:House},{href:"/planner",label:"Планировщик",short:"Планы",icon:CalendarDays},{href:"/nutrition",label:"Питание",icon:Utensils},{href:"/water",label:"Вода",icon:Droplets},{href:"/habits",label:"Привычки",icon:Leaf},{href:"/progress",label:"Мой прогресс",short:"Прогресс",icon:ChartNoAxesCombined}];
 export function AppShell({children}:{children:ReactNode}){
   const {t}=useI18n();
@@ -42,7 +43,7 @@ export function AppShell({children}:{children:ReactNode}){
       </aside>
       <div className={`main ${pathname==="/" ? "today-surface" : ""}`}>
         <div className="day-background-layer" aria-hidden="true"/><header className="topbar"><div className="breadcrumbs"><span className="desktop-crumb">Day</span><ChevronRight size={12}/><span>{t(current)}</span></div><div className="topbar-tools"><GlobalSearch key={user?.id||"guest"}/><span className="local-status"><span className="status-dot"/>{t(user ? "Личный аккаунт" : "На устройстве")}</span><ThemeToggle mode={resolvedTheme} disabled={!ready} showLabel={false} onModeChange={(mode,details)=>setTheme(mode,details?.origin)} className="app-theme-toggle"/><button className="icon-button collapse-toggle" aria-label={t(collapsed ? "Развернуть меню" : "Свернуть меню")} onClick={()=>setCollapsed(!collapsed)}>{collapsed ? <Menu size={18}/> : <PanelLeftClose size={18}/>}</button></div></header>
-        <main id="main-content" className="content"><AppReadyContent>{children}</AppReadyContent></main>
+        <main id="main-content" className="content"><AppReadyContent><PageTransition routeKey={pathname}>{children}</PageTransition></AppReadyContent></main>
       </div>
       <MobileNav pathname={pathname} disabled={!ready} onToday={()=>setDate(dayKey())} onAdd={()=>openModal({type:"task"})}/>
       <AccountOnboarding/>

@@ -417,6 +417,36 @@ describe("automatic account synchronization",()=>{
     expect(current.data.preferences.theme).toBe("dark");
     expect(localStorage.getItem("day-user-account:revision")).toBe("3");
   });
+  it("retains unuploaded local photos when a clean record snapshot pulls newer remote changes",async()=>{
+    await login();
+    const avatar="11111111-1111-4111-8111-111111111111",dayIcon="22222222-2222-4222-8222-222222222222";
+    act(()=>current.setPreferences({personalPhotos:{avatar},dayIcons:{"2026-11-21":dayIcon}}));
+    await act(async()=>{await vi.advanceTimersByTimeAsync(900);});
+    expect(saves()).toHaveLength(1);
+    const remote=withName(emptyData(),"Other device");
+    remote.preferences.theme="dark";
+    remote.tasks=[{id:"remote-task",title:"Created elsewhere",date:"2026-11-21",description:"",time:"",priority:"normal",category:"Личное",repeat:"none",completedDates:[]}];
+    connection.rpc.mockImplementation(async(name:string)=>name==="load_day_state"?{data:{data:remote,revision:4},error:null}:{data:5,error:null});
+    await act(async()=>{window.dispatchEvent(new Event("focus"));});
+    expect(current.data.preferences.personalPhotos.avatar).toBe(avatar);
+    expect(current.data.preferences.dayIcons["2026-11-21"]).toBe(dayIcon);
+    expect(current.data.tasks).toEqual(remote.tasks);
+    expect(current.data.preferences.name).toBe("Other device");
+    expect(current.data.preferences.theme).toBe("dark");
+    expect(JSON.parse(localStorage.getItem("day-user-account")!).preferences.personalPhotos.avatar).toBe(avatar);
+    expect(current.cloudStatus).toBe("pending");
+    expect(localStorage.getItem("day-user-account:dirty")).toBe("0");
+    act(()=>current.setPreferences({cloudPhotoIds:[avatar,dayIcon]}));
+    await act(async()=>{await vi.advanceTimersByTimeAsync(900);});
+    expect(saves()[1][1]).toMatchObject({expected_revision:4,payload:{tasks:remote.tasks,preferences:{personalPhotos:{avatar},dayIcons:{"2026-11-21":dayIcon}}}});
+    expect(current.cloudStatus).toBe("saved");
+  });
+  it("does not report every change saved while a local photo is waiting for upload",async()=>{
+    await login();
+    act(()=>current.setPreferences({personalPhotos:{avatar:"11111111-1111-4111-8111-111111111111"}}));
+    await act(async()=>{await vi.advanceTimersByTimeAsync(900);});
+    expect(current.cloudStatus).toBe("pending");
+  });
   it("preserves pending local work and stops on a newer remote revision",async()=>{
     await login(withName(emptyData(),"Pending local"),5,"1");
     await act(async()=>{await vi.advanceTimersByTimeAsync(1500);});
@@ -439,15 +469,32 @@ describe("automatic account synchronization",()=>{
       expect(current.cloudStatus).toBe("saved");
     }finally{online.mockRestore();}
   });
-  it("never uploads an empty local reset until a subsequent explicit change",async()=>{
-    await login();
+  it("keeps a local reset from deleting cloud records after later edits or a reload",async()=>{
+    const remote=withName(emptyData(),"Cloud copy");
+    remote.tasks=[{id:"saved-task",title:"Keep in account",date:"2026-11-21",description:"",time:"",priority:"normal",category:"Личное",repeat:"none",completedDates:[]}];
+    await login(remote);
     act(()=>current.resetData());
     await act(async()=>{await vi.advanceTimersByTimeAsync(2000);});
     expect(saves()).toHaveLength(0);
-    expect(localStorage.getItem("day-user-account:dirty")).toBe("0");
     act(()=>current.setPreferences({name:"Fresh local edit"}));
     await act(async()=>{await vi.advanceTimersByTimeAsync(900);});
+    expect(saves()).toHaveLength(0);
+    expect(current.cloudStatus).toBe("conflict");
+    cleanup();
+    render(<DayProvider><Probe/></DayProvider>);
+    act(()=>connection.listener!("SIGNED_IN",{user:{id:"account"}} as Session));
+    await act(async()=>{await vi.advanceTimersByTimeAsync(0);});
+    expect(current.data.preferences.name).toBe("Fresh local edit");
+    expect(current.data.tasks).toEqual([]);
+    act(()=>current.setPreferences({theme:"dark"}));
+    await act(async()=>{await vi.advanceTimersByTimeAsync(900);});
+    expect(saves()).toHaveLength(0);
+    await act(async()=>{await current.restoreCloud();});
+    expect(current.data.tasks).toEqual(remote.tasks);
+    act(()=>current.setPreferences({name:"After explicit restore"}));
+    await act(async()=>{await vi.advanceTimersByTimeAsync(900);});
     expect(saves()).toHaveLength(1);
+    expect(saves()[0][1]).toMatchObject({expected_revision:2,payload:{tasks:remote.tasks}});
   });
   it("ignores an old account save acknowledgement after switching accounts",async()=>{
     await login();

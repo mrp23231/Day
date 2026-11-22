@@ -5,7 +5,7 @@ export const dayIconsSchema = z.record(dateSchema,z.uuid()).refine(icons=>Object
 const idSchema = z.string().min(1).max(100);
 const amountSchema = z.number().finite().min(0).max(50000);
 export const taskSchema = z.object({ id: idSchema, title: z.string().trim().min(1,"Добавьте название").max(180), description: z.string().max(2000), date: dateSchema, time: z.union([z.literal(""),z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/)]), priority: z.enum(["low","normal","high"]), category: z.string().min(1).max(50), repeat: z.enum(["none","daily","weekdays","weekly"]), completedDates: z.array(dateSchema).max(20000), excludedDates: z.array(dateSchema).max(20000).optional() });
-export const foodSchema = z.object({ id: idSchema, name: z.string().trim().min(1,"Добавьте название блюда").max(180), date: dateSchema, meal: z.enum(["breakfast","lunch","dinner","snack"]), grams: z.number().finite().positive().max(10000), calories: amountSchema, protein: amountSchema, fat: amountSchema, carbs: amountSchema, favorite: z.boolean() });
+export const foodSchema = z.object({ id: idSchema, name: z.string().trim().min(1,"Добавьте название блюда").max(180), date: dateSchema, meal: z.enum(["breakfast","lunch","dinner","snack"]), grams: z.number().finite().positive().max(10000), calories: amountSchema, protein: amountSchema, fat: amountSchema, carbs: amountSchema, favorite: z.boolean(), estimated: z.boolean().optional() });
 export const waterSchema = z.object({ id: idSchema, date: dateSchema, time: z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/), amount: z.number().int().min(1).max(3000) });
 export const habitSchema = z.object({ id: idSchema, name: z.string().trim().min(1,"Добавьте название привычки").max(120), icon: z.enum(["leaf","book","activity","moon","heart","sun"]), days: z.array(z.number().int().min(0).max(6)).min(1,"Выберите хотя бы один день").max(7), completions: z.array(dateSchema).max(20000) });
 export const todayCards = ["plan","next","habits","water","food","review"] as const;
@@ -30,11 +30,12 @@ export const preferencesSchema = z.object({ name: z.string().max(60), language: 
 export const appDataSchema = z.object({ version: z.literal(1), tasks: z.array(taskSchema).max(10000), foods: z.array(foodSchema).max(30000), water: z.array(waterSchema).max(30000), habits: z.array(habitSchema).max(500), reviews:z.array(dayReviewSchema).max(10000).default([]), preferences: preferencesSchema });
 export type Task = z.infer<typeof taskSchema>;
 export type Food = z.infer<typeof foodSchema>;
+export type FoodNutrient = "calories" | "protein" | "fat" | "carbs";
 export type Water = z.infer<typeof waterSchema>;
 export type Habit = z.infer<typeof habitSchema>;
 export type Preferences = z.infer<typeof preferencesSchema>;
 export type AppData = z.infer<typeof appDataSchema>;
-export type ModalState = { type:"task"; item?:Task } | { type:"food"; item?:Food; meal?:Food["meal"] } | { type:"water" } | { type:"habit"; item?:Habit } | { type:"calculator" } | { type:"scanner" } | { type:"auth"; method?:"email"; mode?:"login"|"signup" } | { type:"onboarding" } | null;
+export type ModalState = { type:"task"; item?:Task } | { type:"food"; item?:Food; meal?:Food["meal"]; missingNutrition?:FoodNutrient[] } | { type:"water" } | { type:"habit"; item?:Habit } | { type:"calculator" } | { type:"scanner" } | { type:"auth"; method?:"email"; mode?:"login"|"signup" } | { type:"onboarding" } | null;
 export const meals = { breakfast:"Завтрак", lunch:"Обед", dinner:"Ужин", snack:"Перекус" };
 export const weekdays = ["Вс","Пн","Вт","Ср","Чт","Пт","Сб"];
 export function emptyData(): AppData { return { version:1, tasks:[], foods:[], water:[], habits:[], reviews:[], preferences: { name:"", language:"ru", theme:"system", background:"classic", personalPhotos:{},dayIcons:{},cloudPhotoIds:[],photoTone:"mono",todayOrder:[...todayCards],todayHidden:[],nutritionMode:"simple", waterGoal:2000, calorieGoal:2000, proteinGoal:100, fatGoal:67, carbsGoal:250, onboardingDone:false, accountOnboardingDone:false, onboardingFocus:"planning", onboardingPace:"gentle", calorieGoalSet:false } }; }

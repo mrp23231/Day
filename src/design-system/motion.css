@@ -1,0 +1,56 @@
+/* Finite entries and tactile controls; the default state stays fully visible. */
+:root {
+  --motion-ease: cubic-bezier(.22, 1, .36, 1);
+  --motion-fast: 140ms;
+  --motion-entry: 220ms;
+}
+
+.page-transition { min-width: 0; }
+.dialog-overlay,.dialog-content { animation: none; }
+.dialog-content { --dialog-motion-offset: 8px; --dialog-motion-scale: .99; }
+
+.button,.icon-button,.quick-action,.add-row {
+  transition: background-color var(--motion-fast) ease, color var(--motion-fast) ease,
+    border-color var(--motion-fast) ease, box-shadow var(--motion-fast) ease,
+    transform var(--motion-fast) var(--motion-ease);
+}
+.button:disabled,.button[aria-disabled="true"] { transform: none; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .content-enter {
+    animation: day-content-enter 200ms var(--motion-ease) var(--content-enter-delay, 0s) backwards;
+  }
+  .button:not(:disabled):not([aria-disabled="true"]):active,
+  .icon-button:not(:disabled):not([aria-disabled="true"]):active,
+  .quick-action:not(:disabled):not([aria-disabled="true"]):active,
+  .add-row:not(:disabled):not([aria-disabled="true"]):active { transform: scale(.985); }
+
+  .dialog-overlay[data-state="open"] { animation: day-overlay-in 180ms ease-out; }
+  .dialog-overlay[data-state="closed"] { animation: day-overlay-out var(--motion-fast) ease-in both; }
+  .dialog-content[data-state="open"] { animation: day-dialog-in var(--motion-entry) var(--motion-ease); }
+  .dialog-content[data-state="closed"] { animation: day-dialog-out 150ms ease-in both; }
+}
+
+@keyframes day-content-enter {
+  from { opacity: .35; translate: 0 4px; }
+  to { opacity: 1; translate: none; }
+}
+@keyframes day-overlay-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes day-overlay-out { from { opacity: 1; } to { opacity: 0; } }
+/* Individual translate/scale preserve desktop centering and mobile positioning. */
+@keyframes day-dialog-in {
+  from { opacity: 0; translate: 0 var(--dialog-motion-offset); scale: var(--dialog-motion-scale); }
+  to { opacity: 1; translate: none; scale: 1; }
+}
+@keyframes day-dialog-out {
+  from { opacity: 1; translate: none; scale: 1; }
+  to { opacity: 0; translate: 0 4px; scale: .995; }
+}
+
+@media (max-width: 760px) {
+  .dialog-content { --dialog-motion-offset: 12px; --dialog-motion-scale: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .content-enter,.dialog-overlay,.dialog-content { animation: none; }
+  .button:active,.icon-button:active,.quick-action:active,.add-row:active { transform: none; }
+}

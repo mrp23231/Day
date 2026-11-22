@@ -1,0 +1,10 @@
+.git
+.next
+node_modules
+.env*
+*.tsbuildinfo
+.DS_Store
+docs
+artifacts
+playwright-report
+test-results

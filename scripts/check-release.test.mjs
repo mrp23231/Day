@@ -12,12 +12,19 @@ const configured = {
   NEXT_PUBLIC_SUPABASE_ANON_KEY: "sb_publishable_test_public_key",
   SUPABASE_SERVICE_ROLE_KEY: "server-only-test-admin-key",
   OPENAI_API_KEY: "server-only-test-openai-key",
+  GEMINI_API_KEY: "server-only-test-gemini-key",
 };
 
 test("missing integrations block the configured beta without blocking local mode", () => {
   const report = inspectReleaseEnvironment({}, "20.20.1");
   assert.equal(report.ready, false);
-  assert.deepEqual(report.checks.filter((check) => !check.ok).map((check) => check.id), ["supabase-url", "supabase-public-key", "supabase-admin-key", "openai-key"]);
+  assert.deepEqual(report.checks.filter((check) => !check.ok).map((check) => check.id), ["supabase-url", "supabase-public-key", "supabase-admin-key", "openai-key", "food-ai-key"]);
+});
+
+test("food recognition checks the explicitly selected provider without a paid fallback", () => {
+  assert.equal(inspectReleaseEnvironment({...configured,GEMINI_API_KEY:""}).checks.find(check=>check.id==="food-ai-key")?.ok,false);
+  assert.equal(inspectReleaseEnvironment({...configured,GEMINI_API_KEY:"",FOOD_AI_PROVIDER:"openai"}).ready,true);
+  assert.equal(inspectReleaseEnvironment({...configured,FOOD_AI_PROVIDER:"unknown"}).ready,false);
 });
 
 test("all required settings and a supported Node version satisfy the configuration check", () => {
@@ -69,6 +76,8 @@ function withEnvironmentFiles(files, run) {
     const env = { ...process.env, NODE_ENV: "test" };
     for (const name of Object.keys(configured)) delete env[name];
     delete env.OPENAI_MODEL;
+    delete env.FOOD_AI_PROVIDER;
+    delete env.GEMINI_FOOD_MODEL;
     delete env.__NEXT_PROCESSED_ENV;
     return run((args = []) => spawnSync(process.execPath, [fileURLToPath(new URL("./check-release.mjs", import.meta.url)), ...args], { cwd: directory, env, encoding: "utf8" }));
   } finally {
@@ -79,7 +88,7 @@ function withEnvironmentFiles(files, run) {
 test("CLI loads production files with Next precedence without exposing their values", () => {
   withEnvironmentFiles({
     ".env.local": "NEXT_PUBLIC_SUPABASE_URL=https://example.supabase.co\n",
-    ".env.production": `NEXT_PUBLIC_SUPABASE_URL=invalid\nNEXT_PUBLIC_SUPABASE_ANON_KEY=${configured.NEXT_PUBLIC_SUPABASE_ANON_KEY}\nSUPABASE_SERVICE_ROLE_KEY=${configured.SUPABASE_SERVICE_ROLE_KEY}\nOPENAI_API_KEY=${configured.OPENAI_API_KEY}\n`,
+    ".env.production": `NEXT_PUBLIC_SUPABASE_URL=invalid\nNEXT_PUBLIC_SUPABASE_ANON_KEY=${configured.NEXT_PUBLIC_SUPABASE_ANON_KEY}\nSUPABASE_SERVICE_ROLE_KEY=${configured.SUPABASE_SERVICE_ROLE_KEY}\nOPENAI_API_KEY=${configured.OPENAI_API_KEY}\nGEMINI_API_KEY=${configured.GEMINI_API_KEY}\n`,
     ".env.development": "OPENAI_API_KEY=\n",
   }, (run) => {
     const result = run(["--strict"]);

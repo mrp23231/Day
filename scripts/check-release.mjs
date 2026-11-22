@@ -47,6 +47,11 @@ export function inspectReleaseEnvironment(env, nodeVersion = process.versions.no
     }
     checks.push({ id, label, ok, detail });
   }
+  const provider = String(env.FOOD_AI_PROVIDER || "gemini").trim().toLowerCase();
+  const providerValid = ["gemini", "openai"].includes(provider);
+  const foodKey = provider === "openai" ? "OPENAI_API_KEY" : "GEMINI_API_KEY";
+  const foodReady = providerValid && Boolean(String(env[foodKey] || "").trim());
+  checks.push({ id:"food-ai-key", label:providerValid?`${foodKey} · распознавание еды`:"FOOD_AI_PROVIDER", ok:foodReady, detail:!providerValid?"Поддерживаются gemini или openai; автоматического переключения нет.":foodReady?"Задано; доступность модели и квота проверяются отдельно.":"Не задано. Ручной ввод питания доступен." });
   return { checks, ready: checks.every((check) => check.ok) };
 }
 
@@ -55,6 +60,7 @@ export function renderReleaseReport(report) {
     "Day — проверка конфигурации production",
     ...report.checks.map((check) => `${check.ok ? "OK" : "НУЖНО"} · ${check.label}: ${check.detail}`),
     "OPENAI_MODEL необязателен; без значения используется модель по умолчанию приложения.",
+    "Распознавание еды использует Gemini по умолчанию; бесплатная квота и региональная доступность проверяются отдельно.",
     report.ready ? "Конфигурация задана. Это не подтверждает готовность к публикации." : "Облачная бета пока не настроена; локальный режим остаётся доступен.",
     "Live-проверки входа, писем, двух аккаунтов/RLS, удаления и AI обязательны: docs/release.md.",
   ].join("\n");

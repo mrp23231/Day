@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, type KeyboardEvent } from "react";
+import { useMemo, useRef, useState, type KeyboardEvent } from "react";
 import { Check, ChevronLeft, ChevronRight, Plus, Search, SlidersHorizontal } from "lucide-react";
 import { MotionConfig, motion, useReducedMotion } from "motion/react";
 import { useI18n } from "@/components/i18n-provider";
@@ -90,11 +90,16 @@ export function Planner() {
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("all");
   const reducedMotion = useReducedMotion();
-  const dateTasks = new Map<string, Task[]>();
-  const forDate = (day: string) => {
-    if (!dateTasks.has(day)) dateTasks.set(day, filterTasksForDate(data.tasks, day, search, filter).sort((a, b) => (a.time || "99").localeCompare(b.time || "99")));
-    return dateTasks.get(day)!;
-  };
+  const dateTasks = useMemo(() => {
+    const dates = new Set([date, ...weekDays(date)]);
+    if (view === "month") calendarMonthDays(date).forEach(day => dates.add(day));
+    if (view === "year") {
+      const year = dateFromKey(date).getFullYear();
+      for (let month = 1; month <= 12; month++) calendarMonthDays(`${year}-${String(month).padStart(2,"0")}-01`).forEach(day => dates.add(day));
+    }
+    return new Map([...dates].map(day => [day, filterTasksForDate(data.tasks, day, search, filter).sort((a,b) => (a.time || "99").localeCompare(b.time || "99"))]));
+  }, [data.tasks,date,view,search,filter]);
+  const forDate = (day: string) => dateTasks.get(day) ?? [];
   const tasks = forDate(date);
   const week = weekDays(date);
   const year = dateFromKey(date).getFullYear();

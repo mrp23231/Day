@@ -11,7 +11,7 @@ import { shouldCelebrateTasks } from "@/lib/completion";
 import { useAppearance } from "@/features/appearance/use-appearance";
 import type { ThemeMode, ThemeRevealOrigin } from "@/components/ui/theme-toggle";
 import { canRestoreCloud, currentCloudOperation, recoveryRequested } from "@/lib/state-policy";
-import { decodeCloudState, encodeCloudState, prepareCloudRestoreData } from "@/lib/cloud-state";
+import { decodeCloudState, encodeCloudState, hasPendingCloudPhotos, prepareAutomaticCloudRestoreData, prepareCloudRestoreData } from "@/lib/cloud-state";
 import { parseBackup, prepareExportData, prepareImportedData } from "@/lib/backup";
 import { withNetworkDeadline } from "@/lib/network-deadline";
 import { clearPhotoScope } from "@/lib/personalization";
@@ -41,6 +41,7 @@ export function DayProvider({children}:{children:ReactNode}) {
   const [cloudPulse,setCloudPulse]=useState(0);
   const dirty=useRef(false);
   const cloudConflict=useRef(false);
+  const cloudResetPending=useRef(false);
   const baselineKnown=useRef(false);
   const saving=useRef<{scope:string;generation:number;promise:Promise<void>}|null>(null);
   const pulling=useRef<{scope:string;generation:number;promise:Promise<void>}|null>(null);
@@ -82,7 +83,7 @@ export function DayProvider({children}:{children:ReactNode}) {
       const nextScope=session?.user?`day-user-${session.user.id}`:GUEST_KEY;
       if(nextScope===scope.current){if(!session?.user)setAuthReady(true);if(recovery)openModal({type:"auth"});return;}
       setAuthReady(!session?.user);
-      dismissNotifications();scope.current=nextScope;generation.current++;mutation.current=0;revision.current=0;dirty.current=false;baselineKnown.current=false;cloudConflict.current=false;blocked.current=false;setStorageError("");setSyncing(false);setCloudStatus(session?.user?"pending":"local");setStorageScope(nextScope);openModal(recovery?{type:"auth"}:null);
+      dismissNotifications();scope.current=nextScope;generation.current++;mutation.current=0;revision.current=0;dirty.current=false;baselineKnown.current=false;cloudConflict.current=false;cloudResetPending.current=false;blocked.current=false;setStorageError("");setSyncing(false);setCloudStatus(session?.user?"pending":"local");setStorageScope(nextScope);openModal(recovery?{type:"auth"}:null);
       setHasLocalBackup(false);
       try{
         setHasLocalBackup(!!localStorage.getItem(`${nextScope}:backup`));
@@ -92,6 +93,8 @@ export function DayProvider({children}:{children:ReactNode}) {
         revision.current=Number.isSafeInteger(storedRevision)&&storedRevision>=0?storedRevision:0;
         // Pre-autosync account copies may contain unsaved changes. Preserve them.
         dirty.current=!!session?.user&&(localStorage.getItem(`${nextScope}:dirty`)==="1"||!!raw&&localStorage.getItem(`${nextScope}:dirty`)===null);
+        cloudResetPending.current=!!session?.user&&localStorage.getItem(`${nextScope}:reset-pending`)==="1";
+        cloudConflict.current=cloudResetPending.current;
       }catch{blocked.current=true;setStorageError("Не удалось прочитать сохранённые записи этого аккаунта.");setData(emptyData());}
       const started={scope:nextScope,generation:generation.current,mutation:mutation.current};
       if(session?.user)setTimeout(async()=>{
@@ -142,13 +145,18 @@ export function DayProvider({children}:{children:ReactNode}) {
         const remoteRevision=remote?.revision??0;
         if(!Number.isSafeInteger(remoteRevision)||remoteRevision<0)throw new Error("Invalid cloud revision");
         baselineKnown.current=true;
+        if(cloudResetPending.current){
+          if(remote){cloudConflict.current=true;setCloudStatus("conflict");return;}
+          // An empty account has no remote records for a local reset to erase.
+          localStorage.setItem(`${started.scope}:reset-pending`,"0");cloudResetPending.current=false;cloudConflict.current=false;
+        }
         if(dirty.current||started.mutation!==mutation.current){
           if(remoteRevision!==revision.current){cloudConflict.current=true;setCloudStatus("conflict");}
           else{cloudConflict.current=false;setCloudStatus("pending");}
           return;
         }
         if(remote&&remoteRevision>revision.current){
-          const validated=decodeCloudState(remote.data);
+          const validated=prepareAutomaticCloudRestoreData(decodeCloudState(remote.data),currentData.current);
           // Commit before exposing a remote state; keep the local source if quota or validation fails.
           const revisionKey=`${started.scope}:revision`,dirtyKey=`${started.scope}:dirty`;
           const previousRevision=localStorage.getItem(revisionKey),previousDirty=localStorage.getItem(dirtyKey);
@@ -160,7 +168,7 @@ export function DayProvider({children}:{children:ReactNode}) {
           }
           revision.current=remoteRevision;setData(validated);
         }
-        cloudConflict.current=false;setStorageError("");setCloudStatus("saved");
+        cloudConflict.current=false;setStorageError("");setCloudStatus(hasPendingCloudPhotos(currentData.current)?"pending":"saved");
       }catch{
         if(currentCloudOperation(started,{scope:scope.current,generation:generation.current,mutation:mutation.current})){
           setCloudStatus(navigator.onLine?"error":"offline");setStorageError("Облако недоступно. Записи сохраняются только на этом устройстве.");
@@ -177,7 +185,7 @@ export function DayProvider({children}:{children:ReactNode}) {
     if(!navigator.onLine){setCloudStatus("offline");return;}
     if(!baselineKnown.current||pulling.current){await pullCloud();if(!currentCloudOperation(started,{scope:scope.current,generation:generation.current,mutation:mutation.current}))return;}
     if(saving.current&&currentCloudOperation(started,{...saving.current,mutation:0}))return saving.current.promise;
-    if(!baselineKnown.current||cloudConflict.current){if(manual)notify("Сначала разрешите конфликт облачных копий",{kind:"error"});return;}
+    if(!baselineKnown.current||cloudConflict.current||cloudResetPending.current){if(manual)notify("Сначала разрешите конфликт облачных копий",{kind:"error"});return;}
     if(!dirty.current&&!manual)return;
     const sentMutation=mutation.current;
     const payload=encodeCloudState(currentData.current);
@@ -191,7 +199,7 @@ export function DayProvider({children}:{children:ReactNode}) {
         // The revision belongs to the acknowledged request, even if another edit happened meanwhile.
         revision.current=result;localStorage.setItem(`${started.scope}:revision`,String(result));
         if(mutation.current===sentMutation){localStorage.setItem(started.scope,JSON.stringify(currentData.current));localStorage.setItem(`${started.scope}:dirty`,"0");dirty.current=false;}
-        setStorageError("");setCloudStatus(dirty.current?"pending":"saved");
+        setStorageError("");setCloudStatus(dirty.current||hasPendingCloudPhotos(currentData.current)?"pending":"saved");
         if(manual)notify("Записи сохранены в облаке");
       }catch(error){
         if(currentCloudOperation(started,{scope:scope.current,generation:generation.current,mutation:mutation.current})){
@@ -229,22 +237,24 @@ export function DayProvider({children}:{children:ReactNode}) {
   function persistReplacement(next:AppData,nextRevision?:number,nextDirty=true){
     const key=scope.current,backupKey=`${key}:backup`,revisionKey=`${key}:revision`;
     const previous=blocked.current?localStorage.getItem(key):JSON.stringify(currentData.current);
-    const previousBackup=localStorage.getItem(backupKey),previousRevision=localStorage.getItem(revisionKey),previousDirty=localStorage.getItem(`${key}:dirty`);
+    const previousBackup=localStorage.getItem(backupKey),previousRevision=localStorage.getItem(revisionKey),previousDirty=localStorage.getItem(`${key}:dirty`),previousReset=localStorage.getItem(`${key}:reset-pending`);
     if(!previous)throw new Error("Не удалось подготовить предыдущую копию.");
     try{
       localStorage.setItem(backupKey,previous);
       localStorage.setItem(`${key}:dirty`,nextDirty?"1":"0");
+      localStorage.setItem(`${key}:reset-pending`,"0");
       if(nextRevision!==undefined)localStorage.setItem(revisionKey,String(nextRevision));
       localStorage.setItem(key,JSON.stringify(next));
     }catch(error){
       if(previousDirty===null)localStorage.removeItem(`${key}:dirty`);else localStorage.setItem(`${key}:dirty`,previousDirty);
+      if(previousReset===null)localStorage.removeItem(`${key}:reset-pending`);else localStorage.setItem(`${key}:reset-pending`,previousReset);
       if(nextRevision!==undefined){if(previousRevision===null)localStorage.removeItem(revisionKey);else localStorage.setItem(revisionKey,previousRevision);}
       if(previousBackup===null)localStorage.removeItem(backupKey);else localStorage.setItem(backupKey,previousBackup);
       throw error;
     }
   }
   function finishReplacement(next:AppData,clean=false){
-    dirty.current=scope.current!==GUEST_KEY&&!clean;cloudConflict.current=false;baselineKnown.current=true;setCloudStatus(scope.current===GUEST_KEY?"local":dirty.current?"pending":"saved");
+    dirty.current=scope.current!==GUEST_KEY&&!clean;cloudConflict.current=false;cloudResetPending.current=false;baselineKnown.current=true;setCloudStatus(scope.current===GUEST_KEY?"local":dirty.current||hasPendingCloudPhotos(next)?"pending":"saved");
     generation.current++;mutation.current++;blocked.current=false;dismissNotifications();setStorageError("");setSyncing(false);setAuthReady(true);setHasLocalBackup(true);setData(next);openModal(null);resetEpoch.current++;setResetVersion(resetEpoch.current);
   }
   async function restoreCloud(){
@@ -279,10 +289,11 @@ export function DayProvider({children}:{children:ReactNode}) {
   }
   function resetData(){
     const next=emptyData(),targetScope=scope.current;
-    let previousDirty:string|null=null;
-    try{previousDirty=localStorage.getItem(`${targetScope}:dirty`);localStorage.setItem(`${targetScope}:dirty`,"0");localStorage.setItem(targetScope,JSON.stringify(next));}
-    catch{try{if(previousDirty===null)localStorage.removeItem(`${targetScope}:dirty`);else localStorage.setItem(`${targetScope}:dirty`,previousDirty);}catch{}notify("Не удалось очистить записи. Текущие данные сохранены.",{kind:"error"});return;}
-    generation.current++;mutation.current++;dirty.current=false;cloudConflict.current=false;blocked.current=false;dismissNotifications();setStorageError("");setSyncing(false);setCloudStatus(scope.current===GUEST_KEY?"local":"saved");setAuthReady(true);
+    const guardCloud=targetScope!==GUEST_KEY&&(cloudResetPending.current||revision.current>0||!baselineKnown.current);
+    let previousDirty:string|null=null,previousReset:string|null=null;
+    try{previousDirty=localStorage.getItem(`${targetScope}:dirty`);previousReset=localStorage.getItem(`${targetScope}:reset-pending`);localStorage.setItem(`${targetScope}:dirty`,"0");localStorage.setItem(`${targetScope}:reset-pending`,guardCloud?"1":"0");localStorage.setItem(targetScope,JSON.stringify(next));}
+    catch{try{if(previousDirty===null)localStorage.removeItem(`${targetScope}:dirty`);else localStorage.setItem(`${targetScope}:dirty`,previousDirty);if(previousReset===null)localStorage.removeItem(`${targetScope}:reset-pending`);else localStorage.setItem(`${targetScope}:reset-pending`,previousReset);}catch{}notify("Не удалось очистить записи. Текущие данные сохранены.",{kind:"error"});return;}
+    generation.current++;mutation.current++;dirty.current=false;cloudConflict.current=guardCloud;cloudResetPending.current=guardCloud;blocked.current=false;dismissNotifications();setStorageError("");setSyncing(false);setCloudStatus(scope.current===GUEST_KEY?"local":guardCloud?"conflict":"saved");setAuthReady(true);
     try{localStorage.removeItem(`${targetScope}:backup`);setHasLocalBackup(false);}
     catch{setStorageError("Записи очищены, но не удалось удалить предыдущую резервную копию из браузера.");}
     setData(next);resetEpoch.current++;setResetVersion(resetEpoch.current);notify("Локальные записи очищены");

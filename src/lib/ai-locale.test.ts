@@ -7,6 +7,7 @@ vi.mock("./supabase/server",()=>({serverSupabase:mocks.server}));
 const request=(endpoint:string,body:unknown)=>new Request(`http://localhost:3000/api/ai/${endpoint}`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
 const png=`data:image/png;base64,${Buffer.from([137,80,78,71,13,10,26,10]).toString("base64")}`;
 beforeEach(()=>{
+  vi.stubEnv("FOOD_AI_PROVIDER","openai");
   vi.stubEnv("OPENAI_API_KEY","unit-test-only");
   mocks.server.mockResolvedValue({auth:{getUser:mocks.getUser},rpc:mocks.rpc});
   mocks.getUser.mockResolvedValue({data:{user:{id:"account"}},error:null});

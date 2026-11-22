@@ -14,6 +14,7 @@ import "@/features/focus/focus.css";
 import "@/features/review/review.css";
 import "@/features/review/review-stats.css";
 import "@/design-system/personalization.css";
+import "@/design-system/motion.css";
 export const metadata: Metadata = { title: { default: "Day — планы, питание, привычки", template: "%s · Day" }, description: "Личное пространство для задач, питания, воды и привычек.", applicationName: "Day", icons: { icon: "/icon.svg", apple: "/apple-touch-icon.png" }, appleWebApp: { capable: true, statusBarStyle: "default", title: "Day" }, manifest: "/manifest.webmanifest" };
 export const viewport: Viewport = { width: "device-width", initialScale: 1, viewportFit: "cover", themeColor: [{ media: "(prefers-color-scheme: light)", color: "#ffffff" }, { media: "(prefers-color-scheme: dark)", color: "#101010" }] };
 

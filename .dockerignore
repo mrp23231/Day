@@ -1,8 +1,7 @@
 node_modules
 .next
 .git
-.env.local
-.env
+.env*
 *.log
 .DS_Store
 docs

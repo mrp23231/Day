@@ -9,6 +9,7 @@ import { useDay } from "@/components/day-provider";
 import { PageFooter, PageHeading } from "@/components/shared";
 import { Button } from "@/components/ui/button";
 import { AccountEntry } from "@/features/auth/account-entry";
+import { authCallbackFailure, authCallbackMessage } from "@/features/auth/callback-errors";
 import { AppearanceSettings } from "./appearance";
 import { BackupImport } from "./backup-import";
 import { boundedFetch } from "@/lib/network-deadline";
@@ -21,7 +22,14 @@ function SettingsContent(){const {t}=useI18n();const photos=useOptionalPersonalP
   const {data,user,ready,authReady,setPreferences,notify,openModal,syncCloud,restoreCloud,syncing,cloudStatus,exportData,exportPreviousData,hasLocalBackup,resetData}=useDay();const [confirm,setConfirm]=useState(false);const [restoreConfirm,setRestoreConfirm]=useState(false);const [deleteCloud,setDeleteCloud]=useState(false);const [error,setError]=useState("");const [deleting,setDeleting]=useState(false);
 const active=useRef(true);const deletingRef=useRef(false);const deletion=useRef<AbortController|null>(null);
 useLayoutEffect(()=>{active.current=true;return()=>{active.current=false;deletion.current?.abort();};},[]);
-useEffect(()=>{if(new URLSearchParams(location.search).get("recovery")==="1")openModal({type:"auth"});if(new URLSearchParams(location.search).get("auth_error")==="1")setError("Ссылка входа недействительна или устарела. Запросите новое письмо.");},[openModal,t]);function save(e:React.FormEvent<HTMLFormElement>){e.preventDefault();const f=new FormData(e.currentTarget);const parsed=preferencesSchema.safeParse({...data.preferences,name:String(f.get("name")||"").trim(),waterGoal:Number(f.get("waterGoal")),calorieGoal:Number(f.get("calorieGoal")),proteinGoal:Number(f.get("proteinGoal")),fatGoal:Number(f.get("fatGoal")),carbsGoal:Number(f.get("carbsGoal")),calorieGoalSet:true});if(!parsed.success){setError("Проверьте ориентиры: калории от 800 до 6000, вода от 250 до 6000 мл, положительные значения БЖУ.");return;}setError("");setPreferences(parsed.data);notify(t("Настройки сохранены"));}async function removeAccount(){
+useEffect(()=>{
+  const params=new URLSearchParams(location.search);
+  if(params.get("recovery")==="1")openModal({type:"auth"});
+  // Failed OAuth redirects may carry their details in a fragment, invisible to the server.
+  const failure=authCallbackFailure(new URLSearchParams(location.hash.slice(1)))??params.get("auth_error");
+  const message=authCallbackMessage(failure);
+  if(message)setError(message);
+},[openModal,t]);function save(e:React.FormEvent<HTMLFormElement>){e.preventDefault();const f=new FormData(e.currentTarget);const parsed=preferencesSchema.safeParse({...data.preferences,name:String(f.get("name")||"").trim(),waterGoal:Number(f.get("waterGoal")),calorieGoal:Number(f.get("calorieGoal")),proteinGoal:Number(f.get("proteinGoal")),fatGoal:Number(f.get("fatGoal")),carbsGoal:Number(f.get("carbsGoal")),calorieGoalSet:true});if(!parsed.success){setError("Проверьте ориентиры: калории от 800 до 6000, вода от 250 до 6000 мл, положительные значения БЖУ.");return;}setError("");setPreferences(parsed.data);notify(t("Настройки сохранены"));}async function removeAccount(){
 if(!user||deletingRef.current||!ready||!authReady)return;
 deletingRef.current=true;setDeleting(true);setError("");
 const controller=new AbortController();deletion.current=controller;

@@ -6,6 +6,7 @@ import { useDay } from "@/components/day-provider";
 import { ButtonSignIn } from "@/components/ui/button-sign-in";
 import { withNetworkDeadline } from "@/lib/network-deadline";
 import { getSupabase } from "@/lib/supabase/client";
+import { authErrorMessage } from "./auth-errors";
 
 /** Ignore requests completed after dismissal or an account scope change. */
 export function useAuthRequestScope(scope: string) {
@@ -47,8 +48,8 @@ export function useGoogleSignIn() {const { t } = useI18n();
       if (!current()) return;
       if (error || !data.url) throw error ?? new Error("Missing OAuth URL");
       location.assign(data.url);
-    } catch {
-      if (current()) setError(t("Не удалось открыть вход через Google. Попробуйте ещё раз или выберите электронную почту."));
+    } catch (error) {
+      if (current()) setError(t(authErrorMessage(error, "Не удалось открыть вход через Google. Попробуйте ещё раз или выберите электронную почту.")));
     } finally {
       pending.current = false;
       if (current()) setBusy(false);

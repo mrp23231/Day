@@ -6,13 +6,13 @@ import { useDay } from "./day-provider";
 import { dateFromKey, dayKey, shiftDay, taskDone, taskOnDate, weekDays, type Task, type Habit } from "@/lib/domain";
 import { Button } from "./ui/button";
 import { NeonCheckbox } from "./ui/animated-check-box";
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import { useState } from "react";
 import ScheduleCalendar from "./ui/schedule-calendar";
 import CalendarDayCard from "./ui/cue-cell-to-card-calendar-expansion";
 import { DayIcon, DayIconButton } from "@/features/calendar/day-icon";
 export function PageHeading({title,subtitle,eyebrow,children}:{title:string;subtitle:string;eyebrow?:string;children?:ReactNode}){return <div className="page-heading"><div>{eyebrow&&<p className="eyebrow">{eyebrow}</p>}<h1>{title}</h1><p className="heading-subtitle">{subtitle}</p></div><div className="heading-actions">{children}</div></div>;}
-export function Enter({children,delay=0,className=""}:{children:ReactNode;delay?:number;className?:string}){const reduce=useReducedMotion();return <motion.div className={className} initial={false} animate={{opacity:1,y:0}} transition={{duration:reduce?0:.16,delay:Math.min(delay,.05)}}>{children}</motion.div>;}
+export function Enter({children,delay=0,className=""}:{children:ReactNode;delay?:number;className?:string}){return <div className={`content-enter ${className}`} style={{"--content-enter-delay":`${Math.max(0,Math.min(delay,.06))}s`} as CSSProperties}>{children}</div>;}
 export function Ring({value,size=120,stroke=8,color="var(--primary)",children,label}:{value:number;size?:number;stroke?:number;color?:string;children:ReactNode;label:string}){const reduce=useReducedMotion();const r=(size-stroke)/2;const c=2*Math.PI*r;return <div className="ring-wrap" style={{width:size,height:size}} role="img" aria-label={label}><svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} aria-hidden="true"><circle cx={size/2} cy={size/2} r={r} fill="none" stroke="currentColor" opacity=".07" strokeWidth={stroke}/><motion.circle cx={size/2} cy={size/2} r={r} fill="none" stroke={color} strokeWidth={stroke} strokeLinecap="round" strokeDasharray={c} initial={false} animate={{strokeDashoffset:c*(1-Math.max(0,Math.min(100,value))/100)}} transition={reduce?{duration:0}:{type:"spring",stiffness:40,damping:16}} transform={`rotate(-90 ${size/2} ${size/2})`}/></svg><div className="ring-content">{children}</div></div>;}
 export function WeekStrip(){
   const {t,formatDate}=useI18n();const {data,date,setDate}=useDay();const [expanded,setExpanded]=useState(false);

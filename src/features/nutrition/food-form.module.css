@@ -1,0 +1,31 @@
+.section { display:grid; gap:13px; padding:19px; border:1px solid var(--border); border-radius:17px; min-width:0; }
+.sectionHeading { display:flex; gap:12px; align-items:center; justify-content:space-between; }
+.sectionHeading h3 { display:flex; gap:9px; align-items:center; margin:0; font-size:13px; font-weight:600; letter-spacing:-.15px; }
+.sectionHeading h3 span { font-size:10px; color:var(--muted); font-variant-numeric:tabular-nums; font-weight:500; }
+.helperToggle { display:inline-flex; align-items:center; justify-content:center; gap:5px; border:0; background:none; color:var(--muted); padding:8px 0 8px 8px; font-size:11px; white-space:nowrap; }
+.helperToggle:hover { color:var(--foreground); }
+.gramsInput { font-variant-numeric:tabular-nums; font-size:22px !important; padding:13px 14px !important; }
+.quickWeights { display:flex; gap:7px; flex-wrap:wrap; }
+.quickWeights button { border:1px solid var(--border); background:var(--surface); border-radius:8px; padding:7px 11px; font-size:11px; color:var(--muted); }
+.quickWeights button[aria-pressed="true"] { background:var(--primary); border-color:var(--primary); color:var(--primary-foreground); }
+.helper { display:grid; gap:14px; padding-top:14px; border-top:1px solid var(--border); }
+.quantityRow { display:flex; gap:12px; align-items:end; flex-wrap:wrap; }
+.quantityRow > div { flex:1 1 140px; }
+.quantityRow > button { flex:1 1 160px; min-height:41px; margin-bottom:0; }
+.stepper { display:flex; align-items:center; border:1px solid var(--border); border-radius:10px; overflow:hidden; background:var(--surface); }
+.stepper button { display:grid; place-items:center; flex:0 0 38px; min-height:40px; background:none; border:0; color:var(--foreground); }
+.stepper button:disabled { color:var(--muted); opacity:.4; }
+.stepper input { width:100%; min-width:40px; padding:10px 4px !important; text-align:center; border:0 !important; border-radius:0 !important; background:transparent !important; appearance:textfield; -moz-appearance:textfield; }
+.stepper input::-webkit-inner-spin-button { appearance:none; }
+.note { margin:0; color:var(--muted); line-height:1.7; font-size:11px; }
+.scaling { display:grid; gap:6px; padding-top:4px; }
+.scaling label { align-items:start; font-size:11px; line-height:1.5; }
+.scaling input { margin-top:1px; }
+.modeSwitch { display:flex; padding:4px; border-radius:11px; background:var(--surface-alt); gap:4px; }
+.modeSwitch button { flex:1; border:1px solid transparent; padding:9px 12px; border-radius:8px; color:var(--muted); background:transparent; font-size:12px; }
+.modeSwitch button[aria-pressed="true"] { color:var(--foreground); background:var(--surface); border-color:var(--border); box-shadow:0 1px 3px #00000006; }
+.summary { display:grid; gap:6px; padding:15px; border-radius:11px; background:var(--surface-alt); }
+.summary > span,.summary small { color:var(--muted); font-size:11px; line-height:1.6; }
+.summary strong { font-size:24px; font-weight:550; letter-spacing:-.7px; }
+.section button:focus-visible { outline:2px solid var(--foreground); outline-offset:3px; }
+@media(max-width:480px) { .section { padding:14px; } .sectionHeading { gap:5px; } .sectionHeading h3 { font-size:12px; } .helperToggle { font-size:10px; } .quickWeights { gap:6px; } .quickWeights button { flex:1; padding-inline:8px; } }

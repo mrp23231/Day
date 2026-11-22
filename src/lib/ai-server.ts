@@ -7,8 +7,9 @@ export function apiError(message:string,status=400,locale:Locale="ru") {
   return NextResponse.json({error:getTranslator(locale)(message)},{status,headers:{"Cache-Control":"no-store"}});
 }
 
-export async function authorizeAI(locale:Locale="ru") {
-  if(!process.env.OPENAI_API_KEY)return {error:apiError("Day AI пока не подключён. Для работы нужен ключ OpenAI на сервере. Остальные функции Day доступны.",503,locale)};
+export async function authorizeAI(locale:Locale="ru",configuration?:{configured:boolean;unavailableMessage:string}) {
+  const configured=configuration?.configured??Boolean(process.env.OPENAI_API_KEY);
+  if(!configured)return {error:apiError(configuration?.unavailableMessage??"Day AI пока не подключён. Для работы нужен ключ OpenAI на сервере. Остальные функции Day доступны.",503,locale)};
   try {
     const client=await withNetworkDeadline(serverSupabase());
     if(!client)return {error:apiError("Сначала нужно подключить облачный аккаунт Day.",503,locale)};
